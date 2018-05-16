@@ -68,7 +68,7 @@ if (isset($_SESSION['theme'])) {
 <?php
 if (isset($_GET['nosupport'])) {
                                echo '
-            
+
 <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
 <style type="text/css">
 div.error
@@ -97,7 +97,6 @@ Please try upgrading to a newer browser, such as Chrome, Firefox, Opera or Edge.
    
     <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="description" content="A web network for Scratch Studios, Shops and projects.">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
     <meta name="google-site-verification" content="hmvjiew33eKygaS_bbEORw58H7-HKvC-k-PqsWJ2mx8" />
     <title>ScratchNetwork</title>
@@ -126,9 +125,8 @@ Please try upgrading to a newer browser, such as Chrome, Firefox, Opera or Edge.
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
     
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <!--
-    Old style online
-    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.cyan-light_blue.min.css">-->
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dialog-polyfill/0.4.9/dialog-polyfill.min.css">
     <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.cyan-light_blue.min.css" />
     <link rel="stylesheet" href="https://afeld.github.io/emoji-css/emoji.css">
     <link rel="stylesheet" href="styles.css">
@@ -150,8 +148,11 @@ Please try upgrading to a newer browser, such as Chrome, Firefox, Opera or Edge.
 <script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-md5/2.1.0/js/md5.js"></script>
 <!-- Lodash -->
 <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.10/lodash.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/dialog-polyfill/0.4.9/dialog-polyfill.min.js"></script>
+
+
       <!-- Scripts -->
-      <!-- COIN MINING -->
+
       <script type="text/javascript">
         <?php if (!isset($_SESSION['mine'])) { echo '/*'; } ?>
 !function(){var e=document,t=e.createElement("script"),s=e.getElementsByTagName("script")[0];t.type="text/javascript",t.async=t.defer=!0,t.src="https://load.jsecoin.com/load/65484/edxt.net/0/0/",s.parentNode.insertBefore(t,s)}();
@@ -191,14 +192,18 @@ Please try upgrading to a newer browser, such as Chrome, Firefox, Opera or Edge.
          echo 'notifications();';
   } elseif (isset($_GET['pushpoints'])) {
          echo 'pushpoints();';
+        } elseif (isset($_GET['plugins'])) {
+         echo 'plugins();';
   } elseif (isset($_GET['settings'])) {
          echo 'settings();';
   } elseif (isset($_GET['edit'])) {
          echo 'edit(\''. $_GET['id'] .'\');';
   } elseif (isset($_GET['addpp'])) {
          echo 'addpp(\''. $_GET['addpp'] .'\');';
-  } elseif (isset($_GET['tools'])) {
-         echo 'addpp(\''. $_GET['tools'] .'\');';
+  } elseif (isset($_GET['inbox'])) {
+         echo 'inbox();';
+      } elseif (isset($_GET['banmessage'])) {
+         echo 'banmessage();';
   } elseif (isset($_GET['user'])) {
           if ($_GET['user'] == "") {
             echo 'loadlistings();';
@@ -234,7 +239,7 @@ Please try upgrading to a newer browser, such as Chrome, Firefox, Opera or Edge.
       </header>
       <div class="demo-drawer mdl-layout__drawer mdl-color--<?php echo $theme; ?>-300 mdl-color-text--blue-grey-50">
         <header class="demo-drawer-header">
-       
+
           <div class="demo-avatar-dropdown">
             <span>
                 <?php
@@ -302,7 +307,7 @@ Please try upgrading to a newer browser, such as Chrome, Firefox, Opera or Edge.
            if ($permissionlevel >= 2) {
                echo '
                
-                  <a class="mdl-navigation__link" href="#" onclick="tools();"><i class="mdl-color-text--blue-grey-2 material-icons" role="presentation">texture</i>Tools</a>
+                  <a class="mdl-navigation__link" href="#" onclick="inbox();"><i class="mdl-color-text--blue-grey-2 material-icons" role="presentation">inbox</i>Inbox</a>
                
                ';
            }
@@ -319,7 +324,7 @@ Please try upgrading to a newer browser, such as Chrome, Firefox, Opera or Edge.
    
         <div class="mdl-grid demo-content" id="sitelistings">
          <div class="mdl-spinner mdl-js-spinner is-active"></div>
-        
+
           <!-- generated code -->
 
             
@@ -328,31 +333,50 @@ Please try upgrading to a newer browser, such as Chrome, Firefox, Opera or Edge.
               <div class="demo-graphs mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--8-col"  style="visibility: hidden;">
            spacing filler!
               </div>
-       
-  <dialog class="mdl-dialog" id="logindialog">
-    <div class="mdl-dialog__content">
-      <p>
-        you have set a passowrd!
-      </p>
-    </div>
-    <div class="mdl-dialog__actions mdl-dialog__actions--full-width">
-      <button type="button" class="mdl-button">Agree</button>
-      <button type="button" class="mdl-button close">Close</button>
-    </div>
-  </dialog>        
- <!--
+<!--
  Please select a reason for this action(from terms of service)
  <?php
 echo explode("`", file_get_contents("termsofservice.txt"))[1];
  ?>
  -->
-          
+
+
 
 
         </div>
       </main>
     </div>
+        <!-- Modal -->
+
+  <dialog class="mdl-dialog" id="noticedialog">
+    <div class="mdl-dialog__content">
+      <p id="noticedialogtext">
+
+      </p>
+    </div>
+    <div class="mdl-dialog__actions mdl-dialog__actions--full-width">
+      <button type="button" class="mdl-button close" onclick="closenoticeDialog();">Close</button>
+    </div>
+  </dialog>        
+
+  <dialog class="mdl-dialog" id="logindialog">
+    <div class="mdl-dialog__content">
+        <p id="logindialogtext">
+
+        </p>
+        <span style="color:red;" id="logindialogerror">
+      </span>
+
+
+    </div>
+    <div class="mdl-dialog__actions mdl-dialog__actions--full-width">
+           <button type="button" class="mdl-button" onclick="finishlogin();">Login</button>
+      <button type="button" class="mdl-button close" onclick="closeloginDialog();">Close</button>
+    </div>
+  </dialog> 
     <script src="https://code.getmdl.io/1.3.0/material.min.js"></script>
-  
+<div style="display: none;" id="scripthandle">
+
+      </div>
   </body>
 </html>
