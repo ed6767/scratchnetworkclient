@@ -1,4 +1,4 @@
-  
+
    var fadeDuration = 250;
     var loggedin = false;
     var t=setInterval(sessioncheck,15000);
@@ -63,7 +63,7 @@ function loadbanner(alerttext){
      $("#alertl").html(alerttext);
                 $("#alertl").fadeIn(fadeDuration);
 }
-    
+
     function loadlistings(){
         $("#sitelistings").fadeOut(fadeDuration, function() {
      $.get("server.php?action=getlistings", function(data, status){
@@ -72,8 +72,8 @@ function loadbanner(alerttext){
                     phpvars("main");
     });
 });
-     
-        
+
+
     }
        function loadwaitinglistings(){
         $("#sitelistings").fadeOut(fadeDuration, function() {
@@ -83,8 +83,8 @@ function loadbanner(alerttext){
                 phpvars("waiting");
     });
 });
-     
-        
+
+
     }
            function showuserlistings(username){
                 phpvars("user="+ username);
@@ -92,11 +92,11 @@ function loadbanner(alerttext){
      $.get("server.php?action=getuser&username="+ username, function(data, status){
     $("#sitelistings").html(data);
                 $("#sitelistings").fadeIn(fadeDuration);
-               
+
     });
 });
-     
-        
+
+
     }
                function requestpp(username){
                 phpvars("requestpp="+ username);
@@ -104,16 +104,16 @@ function loadbanner(alerttext){
      $.get("server.php?action=pushpoints&request&username="+ username, function(data, status){
     $("#sitelistings").html(data);
                 $("#sitelistings").fadeIn(fadeDuration);
-               
+
     });
 });
-     
-        
+
+
     }
-                   function tools(tool){
-                phpvars("tools="+ tool);
+                   function inbox(){
+                phpvars("inbox");
         $("#sitelistings").fadeOut(fadeDuration, function() {
-     $.get("server.php?action=tools&"+ tool, function(data, status){
+     $.get("server.php?action=inbox", function(data, status){
     $("#sitelistings").html(data);
                 $("#sitelistings").fadeIn(fadeDuration);
                
@@ -166,28 +166,13 @@ function loadbanner(alerttext){
         
     }
          function newsession(){
-              $("#sitelistings").fadeOut(fadeDuration, function() {
-     $.get("server.php?action=newsession", function(data, status){
-    $("#sitelistings").html(data);
-                $("#sitelistings").fadeIn(fadeDuration);
-                   phpvars("newsession");
-    });
-    });
+   showloginDialog();
         
     }
          function finishlogin(){
-             //getwaitinglistings
-              $("#sitelistings").fadeOut(fadeDuration, function() {
-             $.get("server.php?action=loadingmessage", function(data, status){
-    $("#sitelistings").html(data);
-                $("#sitelistings").fadeIn(fadeDuration);
-    });     
+           document.getElementById("logindialogerror").innerHTML = "Please wait...";
      $.get("server.php?action=finishlogin", function(data, status){
-            $("#sitelistings").fadeOut(fadeDuration, function() {
-    $("#sitelistings").html(data);
-    $("#sitelistings").fadeIn();
-            });      
-    });
+    document.getElementById("logindialogerror").innerHTML = data;
     });
         
     }
@@ -212,6 +197,7 @@ function loadbanner(alerttext){
     }
     
                 function sessioncheck(){
+                    errorsinrow = 0;
  $.get("server.php?action=sessioncheck", function(data, status){
      if (data.includes("!nosession!")) {
        if (loggedin) {
@@ -333,12 +319,12 @@ var location = database.ref('release/polling/items/test/info');
 var data = {
   title: 'Cheese or Crackers?',
   names: ['Cheese!', 'Crackers!', 'I do not care!']
-}
+};
 location.push(data);
 location = database.ref('release/polling/items/test/data');
 data = {
   vote: 0
-}
+};
 location.push(data);
 }
 function testlogin() {
@@ -361,7 +347,7 @@ function plusaccount() {
     });
 });   
 }
-           function settings(){
+           function settings(){ 
         $("#sitelistings").fadeOut(fadeDuration, function() {
      $.get("server.php?action=settings", function(data, status){
     $("#sitelistings").html(data);
@@ -369,8 +355,61 @@ function plusaccount() {
                 phpvars("settings");
     });
 });
-     
-        
+
+
     }
-    
-   
+
+       function plugins(){
+                phpvars("plugins");
+        $("#sitelistings").fadeOut(fadeDuration, function() {
+     $.get("server.php?action=plugins", function(data, status){
+    $("#sitelistings").html(data);
+                $("#sitelistings").fadeIn(fadeDuration);
+
+    });
+});
+
+
+    }
+
+function shownoticeDialog(message) {
+    var dialog = document.querySelector('#noticedialog');
+    if (! dialog.showModal) {
+      dialogPolyfill.registerDialog(dialog);
+    }
+   document.getElementById("noticedialogtext").innerHTML = message;
+    dialog.showModal();
+}
+
+function closenoticeDialog() {
+    var dialog = document.querySelector('#noticedialog');
+    if (! dialog.showModal) {
+      dialogPolyfill.registerDialog(dialog);
+    }
+    dialog.close();
+}
+
+function showloginDialog() {
+    var dialog = document.querySelector('#logindialog');
+    if (! dialog.showModal) {
+      dialogPolyfill.registerDialog(dialog);
+    }
+   document.getElementById("logindialogtext").innerHTML = "Loading login...";
+    dialog.showModal();
+    $.get("server.php?action=newsession", function(data, status){
+    document.getElementById("logindialogtext").innerHTML = data;              
+    });
+}
+function closeloginDialog() {
+    var dialog = document.querySelector('#logindialog');
+    if (! dialog.showModal) {
+      dialogPolyfill.registerDialog(dialog);
+    }
+    dialog.close();
+}
+
+function banmessage() {
+
+    loadlistings();
+     shownoticeDialog("<b>Account Disabled.</b> <br> A ScratchNetwork Admin has decided to disable your account because of multiple terms of service violations. If you think this ban was incorrect or unjust please leave a comment on @myeducate's Scratch Profile.");
+}
